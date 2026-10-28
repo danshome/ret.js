@@ -84,6 +84,9 @@ describe('Regexp Tokenizer Errors', () => {
     // \u escapes are allowed in group names, but not straight after (?.
     testThrow('(?\\u003Da)', 'Invalid group at column 2');
     testThrow('\\x61(?b)', "Invalid group, character 'b' after '?' at column 6");
+    // Lowercase escapes are decoded too, so they must also be rejected here (#55).
+    testThrow('(?\\u003aa)', 'Invalid group at column 2');
+    testThrow('(?\\u003c=a)', 'Invalid group at column 2');
   });
 
   it('Escaped group name syntax', () => {

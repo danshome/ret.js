@@ -280,9 +280,21 @@ describe('Regexp Tokenizer', () => {
         const t = ret('(?<\\u0061\\u0062>c)');
         assert.deepEqual(t.stack, [{ type: types.GROUP, remember: true, name: 'ab', stack: [char('c')] }]);
       });
+      it('Decodes lowercase hex in the name', () => {
+        const t = ret('(?<\\u006e>a)');
+        assert.deepEqual(t.stack, [{ type: types.GROUP, remember: true, name: 'n', stack: [char('a')] }]);
+      });
       it('Closes the name at a unicode-escaped >, as JavaScript engines do', () => {
         const t = ret('(?<n\\u003E>a)');
         assert.deepEqual(t.stack, [{ type: types.GROUP, remember: true, name: 'n', stack: charStr('>a') }]);
+      });
+    });
+
+    describe('with a decoded backslash or hyphen', () => {
+      it('Keeps them literal', () => {
+        assert.deepEqual(ret('[a\\x2dz]').stack, [{ type: types.SET, set: charStr('a-z'), not: false }]);
+        assert.deepEqual(ret('\\x5Cd').stack, [char('\\'), char('d')]);
+        assert.deepEqual(ret('\\x5c1').stack, [char('\\'), char('1')]);
       });
     });
 
